@@ -35,6 +35,8 @@ for product in \
   bigquery \
   cdn \
   datastore \
+  dialogflow \
+  dlp \
   kms \
   iot \
   pubsub \
