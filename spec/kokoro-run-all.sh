@@ -37,12 +37,13 @@ for product in \
   datastore \
   dialogflow \
   dlp \
-  kms \
+  endpoints/getting-started \
   iot \
-  pubsub \
+  kms \
   language \
-  translate \
+  pubsub \
   speech \
+  translate \
   video \
   vision
 do
