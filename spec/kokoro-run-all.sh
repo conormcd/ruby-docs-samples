@@ -41,6 +41,7 @@ for product in \
   iot \
   kms \
   language \
+  logging \
   pubsub \
   speech \
   translate \
