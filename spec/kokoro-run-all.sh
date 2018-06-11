@@ -10,6 +10,7 @@ for required_variable in                   \
   GOOGLE_CLOUD_PROJECT                     \
   GOOGLE_APPLICATION_CREDENTIALS           \
   GOOGLE_CLOUD_STORAGE_BUCKET              \
+  ALTERNATE_GOOGLE_CLOUD_STORAGE_BUCKET    \
 ; do
   if [[ -z "${!required_variable}" ]]; then
     echo "Must set $required_variable"
@@ -29,6 +30,12 @@ function set_failed_status {
 # Print out Ruby version
 ruby --version
 
+# Run Spanner tests if RUN_FULL_TESTS is set.
+if [[ -n $RUN_FULL_TESTS ]]; then
+  export GOOGLE_CLOUD_SPANNER_TEST_INSTANCE=ruby-test-instance
+  export GOOGLE_CLOUD_SPANNER_PROJECT=cloud-samples-ruby-test-0
+fi
+
 # leave this until all tests are added
 for product in \
   auth \
@@ -44,6 +51,7 @@ for product in \
   language \
   logging \
   pubsub \
+  spanner \
   speech \
   translate \
   video \
