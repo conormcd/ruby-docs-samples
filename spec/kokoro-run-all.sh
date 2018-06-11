@@ -33,6 +33,7 @@ ruby --version
 for product in \
   auth \
   bigquery \
+  bigquerydatatransfer \
   cdn \
   datastore \
   dialogflow \
