@@ -1,0 +1,55 @@
+version: 2.0
+
+workflows:
+  version: 2
+  test-all-versions:
+    jobs:
+      - prep-cloud-sql
+      - ruby-2.3.6:
+          requires:
+            - prep-cloud-sql
+
+jobs:
+  prep-cloud-sql:
+    docker:
+      - image: circleci/ruby:2.3.6-stretch
+    steps:
+      - run:
+          name: Download Cloud SQL Proxy
+          command: |
+            mkdir -p ~/workspace
+            curl -Lso ~/workspace/cloud_sql_proxy https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64
+            chmod +x ~/workspace/cloud_sql_proxy
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - cloud_sql_proxy
+  ruby-2.3.6:
+    docker:
+      - image: circleci/ruby:2.3.6-stretch
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Install Cloud SQL Proxy
+          command: |
+            cp ~/workspace/cloud_sql_proxy ~/cloud_sql_proxy
+            sudo mkdir /cloudsql
+            sudo chmod 777 /cloudsql
+      - run:
+          name: Install and configure Google Cloud SDK
+          command: |
+            set -o errexit
+            set -o nounset
+            set -o pipefail
+
+            export CLOUD_SDK_REPO="cloud-sdk-stretch"
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            sudo apt-get update
+            sudo apt-get install google-cloud-sdk
+            echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 --decode > ~/service-account.json
+            echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON_SECONDARY" | base64 --decode > ~/service-account2.json
+            gcloud auth activate-service-account --key-file ~/service-account.json || true
+            gcloud config set project "$GOOGLE_CLOUD_PROJECT"
